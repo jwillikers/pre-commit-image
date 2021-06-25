@@ -7,7 +7,7 @@ set -o errexit
 distro=$(grep '^NAME=' /etc/os-release | cut -d '=' -f 2)
 
 # Remove surrounding quotation marks, which are put there on Ubuntu.
-sed -e 's/^"//' -e 's/"$//' <<<"$distro"
+distro=$(sed -e 's/^"//' -e 's/"$//' <<<"$distro")
 echo "Linux distribution: $distro"
 
 security_option='label=disable'
