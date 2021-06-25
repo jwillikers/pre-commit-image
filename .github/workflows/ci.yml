@@ -1,0 +1,126 @@
+---
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    # Run at 06:10 on Sunday
+    - cron: "10 6 * * 0"
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+      - name: Run the sh-checker
+        uses: luizm/action-sh-checker@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHELLCHECK_OPTS: --color=always
+          SHFMT_OPTS: -s
+        with:
+          sh_checker_comment: true
+
+  build:
+    name: Build
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch:
+          - armhfp
+          - arm64
+          - amd64
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Build the image with Buildah
+        run: ./build.sh -a ${{ matrix.arch }}
+
+      - name: Tag the image for Fedora 34
+        run: podman tag localhost/pre-commit localhost/pre-commit:34
+
+      - name: Export the image
+        run: podman image save --format oci-archive -o pre-commit-${{ matrix.arch }}.tar localhost/pre-commit
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: pre-commit-${{ matrix.arch }}
+          path: pre-commit-${{ matrix.arch }}.tar
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        arch:
+          - armhfp
+          - arm64
+          - amd64
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: pre-commit-${{ matrix.arch }}
+
+      - name: Load the image
+        run: podman image load -i pre-commit-${{ matrix.arch }}.tar
+
+      - name: Test Podman-in-Podman in the container
+        run: podman run --rm --userns keep-id --user podman:podman --device /dev/fuse --security-opt label=disable --volume pre-commit-image:~/.local/share/containers/storage --name test-container localhost/pre-commit podman run registry.fedoraproject.org/fedora-minimal:latest echo "Hello World!"
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Create a manifest
+        run: buildah manifest create pre-commit-multiarch:latest
+
+      # armhfp
+      - uses: actions/download-artifact@v2
+        with:
+          name: pre-commit-armhfp
+
+      - name: Load the armhfp image
+        run: podman image load -i pre-commit-armhfp.tar
+
+      - name: Add the armhfp image to the manifest
+        run: buildah manifest add pre-commit-multiarch:latest localhost/pre-commit
+
+      # aarch64
+      - uses: actions/download-artifact@v2
+        with:
+          name: pre-commit-arm64
+
+      - name: Load the arm64 image
+        run: podman image load -i pre-commit-arm64.tar
+
+      - name: Add the arm64 image to the manifest
+        run: buildah manifest add pre-commit-multiarch:latest localhost/pre-commit
+
+      # x86_64
+      - uses: actions/download-artifact@v2
+        with:
+          name: pre-commit-amd64
+
+      - name: Load the amd64 image
+        run: podman image load -i pre-commit-amd64.tar
+
+      - name: Add the amd64 image to the manifest
+        run: buildah manifest add pre-commit-multiarch:latest localhost/pre-commit
+
+      - name: Push latest manifest and images to quay.io
+        run: buildah manifest push --rm --all --creds jwillikers+publisher:${{ secrets.REGISTRY_PASSWORD }} pre-commit-multiarch:latest docker://quay.io/jwillikers/pre-commit

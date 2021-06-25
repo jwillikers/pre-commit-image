@@ -1,0 +1,137 @@
+= Pre-Commit Image
+Jordan Williams <jordan@jwillikers.com>
+:experimental:
+:icons: font
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+:Buildah: https://buildah.io/[Buildah]
+:Fedora: https://getfedora.org/[Fedora]
+:Fedora-Silverblue: https://silverblue.fedoraproject.org/[Fedora Silverblue]
+:OpenSSH: https://www.openssh.com/[OpenSSH]
+:Podman: https://podman.io/[Podman]
+:Visual-Studio-Code: https://code.visualstudio.com/[Visual Studio Code]
+
+image:https://img.shields.io/github/workflow/status/jwillikers/pre-commit-image/CI/main[GitHub Workflow Status]
+
+A container image for running pre-commit and running hooks in nested containers ala Podman in Podman.
+
+== Synopsis
+
+Supported architectures:: `amd64`, `arm32v7`, `arm64v8`
+User:: podman
+
+== Quick Start
+
+To install pre-commit hooks, run the containers like so.
+
+[source,sh]
+----
+➜ podman run --rm --userns keep-id -v "$PWD":/home/podman/mnt:Z --name pre-commit localhost/pre-commit pre-commit install
+----
+
+More options are required when running pre-commit hooks in their own Podman containers.
+Committing, can be done like so.
+
+[source,sh]
+----
+➜ podman run --rm --userns keep-id --device /dev/fuse --security-opt label=disable -v ~/.config/git:/home/podman/.config/git:ro,z -v "$PWD":/home/podman/mnt:Z -v pre-commit:~/.local/share/containers/storage --name pre-commit localhost/pre-commit git commit -m "My very well-written commit message"
+----
+
+== Build
+
+This project uses {Buildah} and {Podman} for building and testing the image.
+To ensure the shell scripts are kept in good working order, the project uses ShellCheck and shfmt.
+A set of pre-commit checks are readily available to ensure your code is up-to-spec before it is committed.
+Instructions for setting up a development environment, building the image, and testing the image follow.
+These instructions are intended for users of {Fedora-Silverblue}.
+
+I should probably just provide a container with a Bash development environment, shouldn't I?
+
+. Clone this repository.
++
+[source,sh]
+----
+➜ git -C ~/Projects clone git@github.com:jwillikers/pre-commit-image.git
+----
+
+. Change into the project directory.
++
+[source,sh]
+----
+➜ cd ~/Projects/pre-commit-image
+----
+
+. Install pre-commit's Git hooks
++
+[source,sh]
+----
+➜ podman run --rm --userns keep-id -v "$PWD":/home/podman/mnt:Z --name pre-commit localhost/pre-commit pre-commit install
+----
+
+. Run the shell script to build the image.
++
+[source,sh]
+----
+➜ ~/Projects/pre-commit-image/build.sh
+----
+
+. Test the image with the `test.sh` shell script.
++
+[source,sh]
+----
+➜ ~/Projects/pre-commit-image/test.sh
+----
+
+. Use the pre-commit container when committing changes.
++
+[source,sh]
+----
+➜ podman run --rm --userns keep-id --device /dev/fuse --security-opt label=disable -v ~/.config/git:/home/podman/.config/git:ro,z -v "$PWD":/home/podman/mnt:Z -v pre-commit:~/.local/share/containers/storage --name pre-commit localhost/pre-commit git commit -m "My very well-written commit message"
+----
+
+== Learn More
+
+* https://blog.jetbrains.com/clion/2020/01/using-docker-with-clion/[Using Docker with CLion]
+* https://code.visualstudio.com/docs/remote/ssh[Visual Studio Code - Remote Development using SSH]
+
+== Contributing
+
+Contributions in the form of issues, feedback, and even pull requests are welcome.
+Make sure to adhere to the project's link:CODE_OF_CONDUCT.adoc[Code of Conduct].
+
+== Open Source Software
+
+This project is built on the hard work of countless open source contributors.
+Several of these projects are enumerated below.
+
+* https://asciidoctor.org/[Asciidoctor]
+* {Buildah}
+* {Fedora}
+* {Fedora-Silverblue}
+* {GCC}
+* https://git-scm.com/[Git]
+* https://www.linuxfoundation.org/[Linux]
+* {OpenSSH}
+* {Podman}
+* https://www.python.org/[Python]
+* https://rouge.jneen.net/[Rouge]
+* https://www.ruby-lang.org/en/[Ruby]
+
+== Code of Conduct
+
+The project's Code of Conduct is available in the link:CODE_OF_CONDUCT.adoc[Code of Conduct] file.
+
+== License
+
+This repository is licensed under the https://www.gnu.org/licenses/gpl-3.0.html[GPLv3], available in the link:LICENSE.adoc[license file].
+
+© 2021 Jordan Williams
+
+== Authors
+
+mailto:{email}[{author}]
