@@ -75,7 +75,6 @@ podman run \
 	--device /dev/fuse \
 	--security-opt "$security_option" \
 	-v "$test_dir":/home/podman/mnt:Z \
-	-v ~/.config/git:/home/podman/.config/git:ro,z \
 	-v pre-commit:/home/podman/.local/share/containers/storage \
 	--name pre-commit \
 	localhost/pre-commit \
@@ -88,12 +87,6 @@ podman run \
 	--device /dev/fuse \
 	--security-opt "$security_option" \
 	-v "$test_dir":/home/podman/mnt:Z \
-	-v ~/.config/git:/home/podman/.config/git:ro,z \
-	-v "$HOME/.gnupg":/home/podman/.gnupg:ro,z \
-	-v "$HOME/.ssh":/home/podman/.ssh:ro,z \
-	-v "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent":/home/podman/.gnupg/S.gpg-agent \
-	-v "$SSH_AUTH_SOCK":"$SSH_AUTH_SOCK" \
-	-e SSH_AUTH_SOCK="$SSH_AUTH_SOCK" \
 	-v pre-commit:/home/podman/.local/share/containers/storage \
 	--name pre-commit \
 	localhost/pre-commit \
