@@ -46,6 +46,7 @@ Committing can be done like so.
     --security-opt label=disable \
     -v "$PWD":/home/podman/mnt:Z \
     -v ~/.config/git:/home/podman/.config/git:ro,z \
+    -v ~/.cache/pre-commit:/home/podman/.cache/pre-commit:Z \
     -v "$HOME/.gnupg":/home/podman/.gnupg:ro,z \
     -v "$HOME/.ssh":/home/podman/.ssh:ro,z \
     -v "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent":/home/podman/.gnupg/S.gpg-agent \

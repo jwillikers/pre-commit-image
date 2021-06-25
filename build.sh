@@ -49,6 +49,8 @@ buildah run "$CONTAINER" /bin/sh -c 'dnf install -y git gnupg2 openssh pre-commi
 
 buildah run "$CONTAINER" /bin/sh -c 'dnf clean all -y'
 
+buildah config --volume /home/podman/.cache/pre-commit "$CONTAINER"
+
 buildah run --user podman "$CONTAINER" /bin/sh -c 'mkdir /home/podman/mnt'
 
 buildah config --user podman "$CONTAINER"
