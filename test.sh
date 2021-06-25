@@ -11,8 +11,11 @@ distro=$(sed -e 's/^"//' -e 's/"$//' <<<"$distro")
 echo "Linux distribution: $distro"
 
 security_option='label=disable'
+user_option=""
 if [ "$distro" = "Ubuntu" ]; then
 	security_option='apparmor=unconfined'
+	# Necessary for weirdness on GitHub CI.
+	user_option="--user=$(id -ur):$(id -gr)"
 fi
 echo "Security option: $security_option"
 
@@ -72,6 +75,7 @@ git -C "$test_dir" add .pre-commit-config.yaml
 podman run \
 	--rm \
 	--userns keep-id \
+	"$user_option" \
 	--device /dev/fuse \
 	--security-opt "$security_option" \
 	-v "$test_dir":/home/podman/mnt:Z \
@@ -84,6 +88,7 @@ podman run \
 podman run \
 	--rm \
 	--userns keep-id \
+	"$user_option" \
 	--device /dev/fuse \
 	--security-opt "$security_option" \
 	-v "$test_dir":/home/podman/mnt:Z \
