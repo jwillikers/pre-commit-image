@@ -53,7 +53,7 @@ Committing can be done like so.
     -e SSH_AUTH_SOCK="$SSH_AUTH_SOCK" \
     -v pre-commit:/home/podman/.local/share/containers/storage \
     --name pre-commit \
-    localhost/pre-commit \
+    quay.io/jwillikers/pre-commit \
     git commit -m "My very well-written commit message"
 ----
 
@@ -102,26 +102,11 @@ I should probably just provide a container with a Bash development environment, 
 ➜ ~/Projects/pre-commit-image/test.sh
 ----
 
-. Use the pre-commit container when committing changes.
+. Use the pre-commit container when committing changes, which is easily done using the provide `git` script.
 +
 [source,sh]
 ----
-➜ podman run \
-    --rm \
-    --userns keep-id \
-    --device /dev/fuse \
-    --security-opt label=disable \
-    -v ~/.config/git:/home/podman/.config/git:ro,z \
-    -v "$HOME/.gnupg":/home/podman/.gnupg:ro,z \
-    -v "$HOME/.ssh":/home/podman/.ssh:ro,z \
-    -v "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent":/home/podman/.gnupg/S.gpg-agent \
-    -v "$SSH_AUTH_SOCK":"$SSH_AUTH_SOCK" \
-    -e SSH_AUTH_SOCK="$SSH_AUTH_SOCK" \
-    -v "$PWD":/home/podman/mnt:Z \
-    -v pre-commit:/home/podman/.local/share/containers/storage \
-    --name pre-commit \
-    localhost/pre-commit \
-    git commit -m "My very well-written commit message"
+➜ ./git commit -m "Added an incredibly useful feature"
 ----
 
 == Learn More

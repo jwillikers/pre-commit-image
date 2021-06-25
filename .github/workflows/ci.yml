@@ -75,8 +75,8 @@ jobs:
       - name: Load the image
         run: podman image load -i pre-commit-${{ matrix.arch }}.tar
 
-      - name: Test Podman-in-Podman in the container
-        run: podman run --rm --userns keep-id --device /dev/fuse --security-opt label=disable --volume pre-commit-image:/home/podman/.local/share/containers/storage --name test-container localhost/pre-commit podman run registry.fedoraproject.org/fedora-minimal:latest echo "Hello World!"
+      - name: Test
+        run: ${{ github.workspace }}/test.sh
 
   publish:
     name: Publish
