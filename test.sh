@@ -4,6 +4,15 @@ set -o errexit
 # Share storage.
 # -v ~/.local/share/containers/storage:~/.local/share/containers/storage/shared:ro
 
+distro=$(grep '^NAME=' /etc/os-release | cut -d '=' -f 2)
+echo "Linux distribution: $distro"
+
+security_option='label=disable'
+if [ "$distro" = "Ubuntu" ]; then
+	security_option='apparmor=unconfined'
+fi
+echo "Security option: $security_option"
+
 # Create a temporary directory
 test_dir=$(mktemp -d -t test-pre-commit-image.XXXXXXXXXX)
 
@@ -61,7 +70,7 @@ podman run \
 	--rm \
 	--userns keep-id \
 	--device /dev/fuse \
-	--security-opt label=disable \
+	--security-opt "$security_option" \
 	-v "$test_dir":/home/podman/mnt:Z \
 	-v ~/.config/git:/home/podman/.config/git:ro,z \
 	-v pre-commit:/home/podman/.local/share/containers/storage \
@@ -74,7 +83,7 @@ podman run \
 	--rm \
 	--userns keep-id \
 	--device /dev/fuse \
-	--security-opt label=disable \
+	--security-opt "$security_option" \
 	-v "$test_dir":/home/podman/mnt:Z \
 	-v ~/.config/git:/home/podman/.config/git:ro,z \
 	-v "$HOME/.gnupg":/home/podman/.gnupg:ro,z \
