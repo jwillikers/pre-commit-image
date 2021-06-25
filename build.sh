@@ -53,7 +53,7 @@ buildah run --user podman "$CONTAINER" /bin/sh -c 'mkdir /home/podman/mnt'
 
 buildah config --user podman "$CONTAINER"
 
-buildah config --workdir /home/podman/mnt "$CONTAINER"
+buildah config --workingdir /home/podman/mnt "$CONTAINER"
 
 buildah config --label "io.containers.autoupdate=registry" "$CONTAINER"
 
