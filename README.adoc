@@ -22,7 +22,7 @@ A container image for running pre-commit and running hooks in nested containers 
 
 == Synopsis
 
-Supported architectures:: `amd64`, `arm32v7`, `arm64v8`
+Supported architectures:: `amd64`, `arm64v8`
 User:: podman
 
 == Quick Start

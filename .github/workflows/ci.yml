@@ -32,7 +32,6 @@ jobs:
     strategy:
       matrix:
         arch:
-          - armhfp
           - arm64
           - amd64
     steps:
@@ -63,7 +62,6 @@ jobs:
     strategy:
       matrix:
         arch:
-          - armhfp
           - arm64
           - amd64
     steps:
@@ -88,17 +86,6 @@ jobs:
     steps:
       - name: Create a manifest
         run: buildah manifest create pre-commit-multiarch:latest
-
-      # armhfp
-      - uses: actions/download-artifact@v2
-        with:
-          name: pre-commit-armhfp
-
-      - name: Load the armhfp image
-        run: podman image load -i pre-commit-armhfp.tar
-
-      - name: Add the armhfp image to the manifest
-        run: buildah manifest add pre-commit-multiarch:latest localhost/pre-commit
 
       # aarch64
       - uses: actions/download-artifact@v2
