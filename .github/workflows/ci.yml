@@ -75,6 +75,9 @@ jobs:
       - name: Load the image
         run: podman image load -i pre-commit-${{ matrix.arch }}.tar
 
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
       - name: Test
         run: ${{ github.workspace }}/test.sh
 
