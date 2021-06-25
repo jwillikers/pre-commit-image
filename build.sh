@@ -45,7 +45,7 @@ done
 CONTAINER=$(buildah from --arch "$ARCHITECTURE" quay.io/containers/podman:latest)
 IMAGE="pre-commit"
 
-buildah run "$CONTAINER" /bin/sh -c 'dnf install -y git pre-commit python3 python-unversioned-command --nodocs --setopt install_weak_deps=False'
+buildah run "$CONTAINER" /bin/sh -c 'dnf install -y git gnupg2 openssh pre-commit python3 python-unversioned-command --nodocs --setopt install_weak_deps=False'
 
 buildah run "$CONTAINER" /bin/sh -c 'dnf clean all -y'
 

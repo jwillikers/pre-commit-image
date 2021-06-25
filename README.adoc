@@ -34,12 +34,27 @@ To install pre-commit hooks, run the containers like so.
 ➜ podman run --rm --userns keep-id -v "$PWD":/home/podman/mnt:Z --name pre-commit localhost/pre-commit pre-commit install
 ----
 
-More options are required when running pre-commit hooks in their own Podman containers.
-Committing, can be done like so.
+More options are required when running pre-commit hooks in their own Podman containers, especially if you want to use GPG and SSH keys and configuration.
+Committing can be done like so.
 
 [source,sh]
 ----
-➜ podman run --rm --userns keep-id --device /dev/fuse --security-opt label=disable -v ~/.config/git:/home/podman/.config/git:ro,z -v "$PWD":/home/podman/mnt:Z -v pre-commit:/home/podman/.local/share/containers/storage --name pre-commit localhost/pre-commit git commit -m "My very well-written commit message"
+➜ podman run \
+    --rm \
+    --userns keep-id \
+    --device /dev/fuse \
+    --security-opt label=disable \
+    -v "$PWD":/home/podman/mnt:Z \
+    -v ~/.config/git:/home/podman/.config/git:ro,z \
+    -v "$HOME/.gnupg":/home/podman/.gnupg:ro,z \
+    -v "$HOME/.ssh":/home/podman/.ssh:ro,z \
+    -v "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent":/home/podman/.gnupg/S.gpg-agent \
+    -v "$SSH_AUTH_SOCK":"$SSH_AUTH_SOCK" \
+    -e SSH_AUTH_SOCK="$SSH_AUTH_SOCK" \
+    -v pre-commit:/home/podman/.local/share/containers/storage \
+    --name pre-commit \
+    localhost/pre-commit \
+    git commit -m "My very well-written commit message"
 ----
 
 == Build
@@ -91,7 +106,22 @@ I should probably just provide a container with a Bash development environment, 
 +
 [source,sh]
 ----
-➜ podman run --rm --userns keep-id --device /dev/fuse --security-opt label=disable -v ~/.config/git:/home/podman/.config/git:ro,z -v "$PWD":/home/podman/mnt:Z -v pre-commit:/home/podman/.local/share/containers/storage --name pre-commit localhost/pre-commit git commit -m "My very well-written commit message"
+➜ podman run \
+    --rm \
+    --userns keep-id \
+    --device /dev/fuse \
+    --security-opt label=disable \
+    -v ~/.config/git:/home/podman/.config/git:ro,z \
+    -v "$HOME/.gnupg":/home/podman/.gnupg:ro,z \
+    -v "$HOME/.ssh":/home/podman/.ssh:ro,z \
+    -v "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent":/home/podman/.gnupg/S.gpg-agent \
+    -v "$SSH_AUTH_SOCK":"$SSH_AUTH_SOCK" \
+    -e SSH_AUTH_SOCK="$SSH_AUTH_SOCK" \
+    -v "$PWD":/home/podman/mnt:Z \
+    -v pre-commit:/home/podman/.local/share/containers/storage \
+    --name pre-commit \
+    localhost/pre-commit \
+    git commit -m "My very well-written commit message"
 ----
 
 == Learn More
