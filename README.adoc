@@ -92,7 +92,7 @@ I should probably just provide a container with a Bash development environment, 
 +
 [source,sh]
 ----
-➜ ~/Projects/pre-commit-image/build.sh
+➜ podman run --rm --security-opt label=disable --userns keep-id --user build -v "$PWD":/home/build:z -v ~/.local/share/containers:/home/build/.local/share/containers quay.io/buildah/stable /home/build/build.sh
 ----
 
 . Test the image with the `test.sh` shell script.
