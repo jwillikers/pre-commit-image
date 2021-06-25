@@ -5,6 +5,9 @@ set -o errexit
 # -v ~/.local/share/containers/storage:~/.local/share/containers/storage/shared:ro
 
 distro=$(grep '^NAME=' /etc/os-release | cut -d '=' -f 2)
+
+# Remove surrounding quotation marks, which are put there on Ubuntu.
+sed -e 's/^"//' -e 's/"$//' <<<"$distro"
 echo "Linux distribution: $distro"
 
 security_option='label=disable'
