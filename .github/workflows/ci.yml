@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build the image with Buildah
-        run: podman run --rm --security-opt apparmor=unconfined --userns keep-id --user build -v ${{ github.workspace }}:/home/build:z -v ~/.local/share/containers:/home/build/.local/share/containers quay.io/buildah/stable /home/build/build.sh -a ${{ matrix.arch }}
+        run: ./build.sh -a ${{ matrix.arch }}
 
       - name: Tag the image for Fedora 34
         run: podman tag localhost/pre-commit localhost/pre-commit:34
