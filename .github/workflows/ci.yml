@@ -55,36 +55,36 @@ jobs:
           name: pre-commit-${{ matrix.arch }}
           path: pre-commit-${{ matrix.arch }}.tar
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    needs: build
-    strategy:
-      matrix:
-        arch:
-          - arm64
-          - amd64
-    steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+  # test:
+  #   name: Test
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   strategy:
+  #     matrix:
+  #       arch:
+  #         - arm64
+  #         - amd64
+  #   steps:
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v1
 
-      - uses: actions/download-artifact@v2
-        with:
-          name: pre-commit-${{ matrix.arch }}
+  #     - uses: actions/download-artifact@v2
+  #       with:
+  #         name: pre-commit-${{ matrix.arch }}
 
-      - name: Load the image
-        run: podman image load -i pre-commit-${{ matrix.arch }}.tar
+  #     - name: Load the image
+  #       run: podman image load -i pre-commit-${{ matrix.arch }}.tar
 
-      - name: Check out the repository
-        uses: actions/checkout@v2
+  #     - name: Check out the repository
+  #       uses: actions/checkout@v2
 
-      - name: Test
-        run: ${{ github.workspace }}/test.sh
+  #     - name: Test
+  #       run: ${{ github.workspace }}/test.sh
 
   publish:
     name: Publish
     runs-on: ubuntu-latest
-    needs: test
+    needs: build
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Create a manifest
